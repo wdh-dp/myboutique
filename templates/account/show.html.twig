@@ -1,0 +1,78 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Ma commande de référence
+{% endblock %}
+
+{% block content %}
+
+	<h1 class="mt-3">Ma commande de référence
+		{{order.reference}}</h1>
+	<p>Dans cet espace, vous pouvez voir le détail de votre commande</p>
+	<a href="{{path('account')}}">Retour</a>
+	<hr>
+	<strong>Commande passée le :
+		{{order.createdAt | date('d/m/Y')}}</strong>
+	<br><strong>Livrée par
+		{{order.createdAt | date('d/m/Y')}}</strong>
+	<br><strong>Livrée par
+		{{order.carrier.name}}
+	</strong>
+
+	<br><strong>Détails
+	</strong>
+
+
+	<div class="col-md-12">
+		<table class="table">
+			<thead>
+				<tr>
+					<th scope="col">Produit</th>
+					<th scope="col">Nom</th>
+					<th scope="col">Votre commentaire</th>
+					<th scope="col">Quantité</th>
+					<th scope="col">Prix</th>
+					<th scope="col">Total</th>
+
+				</tr>
+			</thead>
+			{% set total = null %}
+			{% for product in order.orderDetails %}
+				{% set total = total + product.quantity * product.product.price %}
+				<tbody>
+					<tr>
+						<th scope="row">
+							<img src="/uploads/{{product.product.illustration}}" alt="{{product.product.name}}" height="100px"></th>
+						<td>{{product.product.name}}</td>
+						<td>
+							<a href="{{path('comment_product',{'slug':product.product.slug})}}">Votre commentaire</a>
+						</td>
+						<td>
+							{{product.quantity}}
+						</td>
+						<td>{{(product.product.price / 100 | number_format(2))}}
+							€</td>
+						<th scope="col">{{(product.quantity * product.product.price) / 100 | number_format(2)}}
+							€</th>
+
+					</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+
+		{% if order.orderDetails | length > 0 %}
+			<div class="text-end">
+				<b>Sous Total:
+					{{(total/100 | number_format(2))}}
+					€</b><br>
+				<b>Livraison:
+					{{(order.carrier.price/100 | number_format(2))}}
+					€</b><br><hr>
+				<b class="border border-primary p-2 bg-primary text-white">Total:
+					{{((total + order.carrier.price)/100 | number_format(2))}}
+					€</b>
+			</div>
+
+
+		{% endif %}
+
+	{% endblock %}
